@@ -3,11 +3,16 @@ MAINTAINER "nmquyet" <minhquyet@gmail.com>
 
 RUN yum -y update
 
+# https://github.com/graphite-project/carbon/tree/0.9.15
+# https://github.com/graphite-project/graphite-web/releases/tag/0.9.15
+
 RUN yum -y install python-devel git gcc pycairo libffi-devel bitmap-*
 RUN cd /usr/local/src && \
     git clone https://github.com/graphite-project/graphite-web.git && \
     git clone https://github.com/graphite-project/carbon.git
 RUN virtualenv /pythonenv/graphite
+RUN cd /usr/local/src/graphite-web && git checkout 0.9.15
+RUN cd /usr/local/src/carbon && git checkout 0.9.15
 
 RUN . /pythonenv/graphite/bin/activate && \
     pip install -r /usr/local/src/graphite-web/requirements.txt && \
@@ -28,12 +33,12 @@ RUN . /pythonenv/graphite/bin/activate && \
 
 # Generate graphite-web static files
 # cd /opt/graphite && \
-RUN . /pythonenv/graphite/bin/activate && \
-    export PYTHONPATH=/opt/graphite/webapp/ && \
-    django-admin.py collectstatic --noinput --settings=graphite.settings
+#RUN . /pythonenv/graphite/bin/activate && \
+#    export PYTHONPATH=/opt/graphite/webapp/ && \
+#    django-admin.py collectstatic --noinput --settings=graphite.settings
 
 RUN chown -R nginx:nginx /opt/graphite/storage/ && \
-    chown -R nginx:nginx /opt/graphite/static/ && \
+    #chown -R nginx:nginx /opt/graphite/static/ && \
     chown -R nginx:nginx /opt/graphite/webapp/
 
 ADD etc/nginx/sites-available/graphite.conf /etc/nginx/sites-available/graphite.conf
